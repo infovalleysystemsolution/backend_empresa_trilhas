@@ -33,9 +33,9 @@ if ($method === 'GET') {
     // Verifica se o parâmetro 'nome' foi passado na URL
     if (isset($_GET['procurarcep'])) {
         $cep = $_GET['procurarcep'];
-        echo "CEP: $cep<br>";
+        echo json_encode(['CEP' => $cep]);
     } else {
-        echo "Parâmetro 'procurarcep' não encontrado na URL<br>";
+        echo "Parâmetro 'procurarcep' não encontrado na URL";
     }
 
 
