@@ -28,7 +28,7 @@ if ($method === 'GET') {
 
 
     // Lógica para lidar com solicitações GET
-    echo json_encode(['message' => 'GET request processed']);
+    //echo json_encode(['message' => 'GET request processed']);
 
     // Verifica se o parâmetro 'nome' foi passado na URL
     if (isset($_GET['procurarcep'])) {
