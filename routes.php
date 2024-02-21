@@ -1,10 +1,16 @@
 <?php
 
-$response = ['error' => false, 'message' => '' , 'data' => null];
+$response_data = ['error' => false, 'message' => '' , 'data' => null];
 
-$data = file_get_contents('php://input', true);
+// Obtém a URL da requisição
+$request = $_SERVER['REQUEST_URI'];
 
-$response = ['error' => false, 'message' => 'file_get_contents' , 'data' => $data ];
+$file_get_contents = json_decode(file_get_contents("php://input"), true);
 
-echo json_encode(['message' => 'PUT request processed', 'data' => $data]);
+$array_data = ['file_get_contents' => $data, 'request' => $request];
+
+$response_data = ['error' => false, 'message' => 'file_get_contents' , 'data' =>  $array_data ];
+
+echo json_encode(['message' => 'PUT request processed', 'data' => $response_data]);
+
 exit;
