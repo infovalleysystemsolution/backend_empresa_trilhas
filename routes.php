@@ -2,7 +2,7 @@
 
 $response = ['error' => false, 'message' => '' , 'data' => null];
 
-$data = json_decode(file_get_contents('php://input'), true);
+$data = file_get_contents('php://input', true);
 
 $response = ['error' => false, 'message' => 'file_get_contents' , 'data' => $data ];
 
