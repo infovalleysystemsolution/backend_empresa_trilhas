@@ -2,4 +2,5 @@ Options +FollowSymLinks
 RewriteEngine On
 
 # Redireciona todas as solicitações para index.php na pasta privada
-RewriteRule ^ index.php [L]
+RewriteRule ^.(*)$../ index.php [L]
+
