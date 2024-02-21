@@ -13,4 +13,3 @@ $response_data = ['error' => false, 'message' => 'file_get_contents' , 'data' =>
 
 echo json_encode(['message' => 'PUT request processed', 'data' => $response_data]);
 
-exit;
