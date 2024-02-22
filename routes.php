@@ -13,3 +13,6 @@
 
 // echo json_encode(['message' => 'PUT request processed', 'data' => $response_data]);
 
+$request = $_REQUEST['procurarcep'];
+
+echo json_encode(['message' => 'PUT request processed', 'data' => $request]);
