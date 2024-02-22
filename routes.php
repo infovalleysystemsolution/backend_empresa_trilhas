@@ -15,8 +15,11 @@ header("Content-Type: application/json");
 // Verifica o método da solicitação
 $method = $_SERVER['REQUEST_METHOD'];
 
+// Obtém a URL da requisição
+$request = $_SERVER['REQUEST_URI'];
+
 // teste de comunicação
-echo json_encode(['message' => 'in index.php root', 'data' => $method]);
+echo json_encode(['message' => 'in index.php root', 'data' => ['method' => $method, 'request' => $request] ]);
 
 // $response_data = ['error' => false, 'message' => '' , 'data' => null];
 
