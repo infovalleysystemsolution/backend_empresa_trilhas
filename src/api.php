@@ -2,21 +2,6 @@
 
 include_once "config_db.php";
 
-// Habilita o CORS para permitir solicitações de qualquer origem
-header("Access-Control-Allow-Origin: *");
-
-// Habilita os métodos HTTP permitidos
-header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE");
-
-// Define os cabeçalhos permitidos
-header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
-
-// Define o tipo de conteúdo como JSON
-header("Content-Type: application/json");
-
-// Verifica o método da solicitação
-$method = $_SERVER['REQUEST_METHOD'];
-
 // Se o método for OPTIONS, é uma solicitação de preflight CORS, então não há necessidade de processar mais nada
 if ($method === 'OPTIONS') {
     http_response_code(200);

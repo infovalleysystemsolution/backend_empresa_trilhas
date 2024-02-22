@@ -1,5 +1,23 @@
 <?php
 
+// Habilita o CORS para permitir solicitações de qualquer origem
+header("Access-Control-Allow-Origin: *");
+
+// Habilita os métodos HTTP permitidos
+header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE");
+
+// Define os cabeçalhos permitidos
+header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+
+// Define o tipo de conteúdo como JSON
+header("Content-Type: application/json");
+
+// Verifica o método da solicitação
+$method = $_SERVER['REQUEST_METHOD'];
+
+// teste de comunicação
+echo json_encode(['message' => 'in index.php root', 'data' => '']);
+
 // $response_data = ['error' => false, 'message' => '' , 'data' => null];
 
 // // Obtém a URL da requisição
@@ -13,6 +31,6 @@
 
 // echo json_encode(['message' => 'PUT request processed', 'data' => $response_data]);
 
-$request = $_REQUEST['procurarcep'];
+// $request = $_REQUEST['procurarcep'];
 
-echo json_encode(['message' => 'PUT request processed', 'data' => $request]);
+// echo json_encode(['message' => 'PUT request processed', 'data' => $request]);
