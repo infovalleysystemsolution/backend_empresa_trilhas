@@ -16,7 +16,7 @@ header("Content-Type: application/json");
 $method = $_SERVER['REQUEST_METHOD'];
 
 // teste de comunicação
-echo json_encode(['message' => 'in index.php root', 'data' => '']);
+echo json_encode(['message' => 'in index.php root', 'data' => $method]);
 
 // $response_data = ['error' => false, 'message' => '' , 'data' => null];
 
