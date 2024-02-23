@@ -50,13 +50,13 @@ if ($method === 'GET') {
         // Converter para UTF-8 usando iconv
         $response = iconv('ISO-8859-1', 'UTF-8', $response);
 
-        // // Detectar a codificação real da resposta
-        // $encoding = mb_detect_encoding($response, 'auto', true);
+        // Detectar a codificação real da resposta
+        $encoding = mb_detect_encoding($response, 'auto', true);
 
-        // // Se necessário, converter para UTF-8
-        // if ($encoding !== 'UTF-8') {
-        //     $response = mb_convert_encoding($response, 'UTF-8', $encoding);
-        // }
+        // Se necessário, converter para UTF-8
+        if ($encoding !== 'UTF-8') {
+            $response = mb_convert_encoding($response, 'UTF-8', $encoding);
+        }
 
         
         if($response === false){
