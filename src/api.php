@@ -1,5 +1,7 @@
 <?php
 
+$conn = null;
+
 include_once "config_db.php";
 
 function findCEP($cep) {
@@ -25,6 +27,9 @@ function findCEP($cep) {
     ";
 
     try {
+
+        $conn = conectBD();
+
         if ($conn != null) {
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':cep', $cep, PDO::PARAM_STR);
@@ -42,7 +47,6 @@ function findCEP($cep) {
         } else {
             return "Conexão falhou.";
         }
-
 
     } catch (PDOException $e) {
         return "Erro na consulta: " . $e->getMessage();
