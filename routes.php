@@ -41,25 +41,27 @@ if ($method === 'GET') {
             return false;
         }
         
-        // $url = 'https://viacep.com.br/ws/' . $cep . '/json/';
-        // $ch = curl_init($url);
-        // curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        // $response = curl_exec($ch);
+        $url = 'https://viacep.com.br/ws/' . $cep . '/json/';
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $response = curl_exec($ch);
         
-        // if($response === false){
-        //     echo "Ocorreu um erro ao executar a requisição: " . curl_error($ch);
-        // } else {
-        //     $data = json_decode($response, true);
-        //     var_dump($data);
-        //     $endereco = $data['logradouro'];
-        //     $bairro = $data['bairro'];
-        //     $cidade = $data['localidade'];
-        //     $estado = $data['uf'];
-        //     $cep = $data['cep'];
-        // }
+        if($response === false){
+            $response_data = ['error' => true, 'message' => "Ocorreu um erro ao executar a requisição: " . curl_error($ch), 'data' => null];
+        } else {
+            $data = json_decode($response, true);
+            // var_dump($data);
+            $data['logradouro'] = $data['logradouro'];
+            $data['bairro'] = $data['bairro'];
+            $data['cidade'] = $data['localidade'];
+            $data['estado'] = $data['uf'];
+            $data['cep'] = $data['cep'];
+            $response_data = ['error' => false, 'message' => "Sucesso ao executar a requisição.", 'data' => $data];            
+        }
         
-        // curl_close($ch);
-        $response_data = ['error' => false, 'message' => '' , 'data' => $cep] ;
+        curl_close($ch);
+
+        $response_data = ['error' => false, 'message' => '' , 'data' => $response_data] ;
 
         echo json_encode($response_data);
     } else {
