@@ -44,8 +44,20 @@ if ($method === 'GET') {
         $url = 'https://viacep.com.br/ws/' . $cep . '/json/';
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Accept: application/json', 'Accept-Charset: utf-8'));        
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Accept: application/json', 'Accept-Charset: utf-8'));       
         $response = curl_exec($ch);
+
+        // Converter para UTF-8 usando iconv
+        $response = iconv('ISO-8859-1', 'UTF-8', $response);
+
+        // // Detectar a codificação real da resposta
+        // $encoding = mb_detect_encoding($response, 'auto', true);
+
+        // // Se necessário, converter para UTF-8
+        // if ($encoding !== 'UTF-8') {
+        //     $response = mb_convert_encoding($response, 'UTF-8', $encoding);
+        // }
+
         
         if($response === false){
             $response_data = ['error' => true, 'message' => "Ocorreu um erro ao executar a requisição: " . curl_error($ch), 'data' => null];
