@@ -37,7 +37,7 @@ function findCEP($cep) {
             if (count($result) > 0) {
                 return $result;
             } else {
-                return [];
+                return ['error' => true, 'message' => "API CEP local não encontrou informação no BD.", 'data' => null];
             }
         } else {
             return "Conexão falhou.";

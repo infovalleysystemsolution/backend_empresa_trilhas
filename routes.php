@@ -48,15 +48,15 @@ if ($method === 'GET') {
         // se informações existirem no banco de dados local, faz uso dos dados locais,
         // caso não exista fzz a consulta na API viacep
         if (count($result) > 0) {
-            $reponse = [];
-            $reponse['api'] = 'local';
-            $reponse['cep'] = $result['cep'];
-            $reponse['logradouro'] = $result['logradouro'];
-            $reponse['bairro'] = $result['nome_bairro'];
-            $reponse['localidade'] = $result['nome_cidade'];
-            $reponse['uf'] = $result['nome_uf'];
-            $reponse['pais'] = $result['nome_pais'];
-            $response_data = $response;
+            // $reponse = [];
+            // $reponse['api'] = 'local';
+            // $reponse['cep'] = $result['cep'];
+            // $reponse['logradouro'] = $result['logradouro'];
+            // $reponse['bairro'] = $result['nome_bairro'];
+            // $reponse['localidade'] = $result['nome_cidade'];
+            // $reponse['uf'] = $result['nome_uf'];
+            // $reponse['pais'] = $result['nome_pais'];
+            $response_data = $result;
         } else {
             $url = 'https://viacep.com.br/ws/' . $cep . '/json/';
             $ch = curl_init($url);
