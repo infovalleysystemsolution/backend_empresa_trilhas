@@ -33,8 +33,12 @@ function findCEP($cep) {
             // Obter resultados
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
     
-            // Exibir os resultados (ou processar conforme necessário)
-            return $result;
+            // retorna os resultados
+            if (count($result) > 0) {
+                return $result;
+            } else {
+                return [];
+            }
         } else {
             return "Conexão falhou.";
         }
