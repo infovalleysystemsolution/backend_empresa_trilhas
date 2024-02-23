@@ -1,5 +1,7 @@
 <?php
 
+include_once  "src/api.php";
+
 // Habilita o CORS para permitir solicitações de qualquer origem
 header("Access-Control-Allow-Origin: *");
 
@@ -40,22 +42,39 @@ if ($method === 'GET') {
             echo "Digite um CEP válido (somente números e com 8 dígitos)";
             return false;
         }
-        
-        $url = 'https://viacep.com.br/ws/' . $cep . '/json/';
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Accept: application/json'));       
-        $response = curl_exec($ch);
-        
-        if($response === false){
-            $response_data = ['error' => true, 'message' => "Ocorreu um erro ao executar a requisição: " . curl_error($ch), 'data' => null];
+
+        $result = findCEP($cep);
+
+        // se informações existirem no banco de dados local, faz uso dos dados locais,
+        // caso não exista fzz a consulta na API viacep
+        if ($result) {
+            $reponse = [];
+            $reponse['api'] = 'local';
+            $reponse['cep'] = $result['cep'];
+            $reponse['logradouro'] = $result['logradouro'];
+            $reponse['bairro'] = $result['nome_bairro'];
+            $reponse['localidade'] = $result['nome_cidade'];
+            $reponse['uf'] = $result['nome_uf'];
+            $reponse['pais'] = $result['nome_pais'];
         } else {
-            $data = json_decode($response, true);
-            // var_dump($data);
-            $response_data = ['error' => false, 'message' => "Sucesso ao executar a requisição.", 'data' => $data];            
+            $url = 'https://viacep.com.br/ws/' . $cep . '/json/';
+            $ch = curl_init($url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array('Accept: application/json'));       
+            $response = curl_exec($ch);
+            
+            if($response === false){
+                $response_data = ['error' => true, 'message' => "Ocorreu um erro ao executar a requisição: " . curl_error($ch), 'data' => null];
+            } else {
+                $reponse['api'] = 'viacep';                
+                $reponse['pais'] = 'Brasil';
+                $data = json_decode($response, true);
+                // var_dump($data);
+                $response_data = ['error' => false, 'message' => "Sucesso ao executar a requisição.", 'data' => $data];            
+            }
+            
+            curl_close($ch);
         }
-        
-        curl_close($ch);
 
         $response_data = ['error' => false, 'message' => '' , 'data' => $response_data] ;
 
