@@ -46,14 +46,6 @@ if ($method === 'GET') {
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Accept: application/json'));       
         $response = curl_exec($ch);
-
-        // Detectar a codificação real da resposta
-        $encoding = mb_detect_encoding($response, 'auto', true);
-
-        // Se necessário, converter para UTF-8
-        if ($encoding !== 'UTF-8') {
-            $response = mb_convert_encoding($response, 'UTF-8', $encoding);
-        }
         
         if($response === false){
             $response_data = ['error' => true, 'message' => "Ocorreu um erro ao executar a requisição: " . curl_error($ch), 'data' => null];
