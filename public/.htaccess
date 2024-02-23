@@ -2,10 +2,16 @@ Options +FollowSymLinks
 RewriteEngine On
 
 # Verifica se o arquivo ou diretório não existe
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
+# RewriteCond %{REQUEST_FILENAME} !-f
+# RewriteCond %{REQUEST_FILENAME} !-d
 
 # Redireciona todas as solicitações para index.php na pasta privada
-RewriteRule ^(.*)$ ../index.php/$1 [L]
+# RewriteRule ^(.*)$ ../index.php/$1 [L]
 
+# Permitir solicitações GET com parâmetros de consulta
+RewriteCond %{REQUEST_METHOD} =GET
+RewriteRule^(.*)$ ../index.php [QSA,L]
 
+# Permitir solicitações DELETE, PUT e POST
+RewriteCond %{REQUEST_METHOD} ^(DELETE|PUT|POST)$
+RewriteRule ^(.*)$ ../index.php [L]
