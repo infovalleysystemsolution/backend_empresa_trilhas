@@ -47,7 +47,7 @@ if ($method === 'GET') {
 
         // se informações existirem no banco de dados local, faz uso dos dados locais,
         // caso não exista fzz a consulta na API viacep
-        if (count($result) > 0) {
+        if ($result['error'] === false) {
             // $reponse = [];
             // $reponse['api'] = 'local';
             // $reponse['cep'] = $result['cep'];

@@ -25,7 +25,7 @@ function findCEP($cep) {
         WHERE
             logradouro.cep = :cep
     ";
-
+    
     try {
 
         $conn = conectBD();
@@ -40,12 +40,12 @@ function findCEP($cep) {
     
             // retorna os resultados
             if (count($result) > 0) {
-                return $result;
+                return ['error' => false, 'message' => "API local encontrou informações CEP no BD.", 'data' => $result];
             } else {
-                return ['error' => true, 'message' => "API CEP local não encontrou informação no BD.", 'data' => null];
+                return ['error' => true, 'message' => "API local não encontrou informações CEP no BD.", 'data' => null];
             }
         } else {
-            return "Conexão falhou.";
+            return ['error' => true, 'message' => "Conexão falhou.", 'data' => null];
         }
 
     } catch (PDOException $e) {
