@@ -44,6 +44,7 @@ if ($method === 'GET') {
         $url = 'https://viacep.com.br/ws/' . $cep . '/json/';
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Accept: application/json'));        
         $response = curl_exec($ch);
         
         if($response === false){
@@ -51,11 +52,6 @@ if ($method === 'GET') {
         } else {
             $data = json_decode($response, true);
             // var_dump($data);
-            $data['logradouro'] = $data['logradouro'];
-            $data['bairro'] = $data['bairro'];
-            $data['cidade'] = $data['localidade'];
-            $data['estado'] = $data['uf'];
-            $data['cep'] = $data['cep'];
             $response_data = ['error' => false, 'message' => "Sucesso ao executar a requisição.", 'data' => $data];            
         }
         
