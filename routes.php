@@ -31,59 +31,12 @@ if ($method === 'GET') {
 
     // Lógica para lidar com solicitações GET
     // echo json_encode(['message' => 'GET request processed']);
-
     // Verifica se o parâmetro 'nome' foi passado na URL
     if (isset($_GET['procurarcep'])) {
-        $cep = $_GET['procurarcep'];
-        // remover todos os caracteres na variável $cep que não forem numéricos
-        $cep = preg_replace("/[^0-9]/", "", $cep);
-
-        if (!is_numeric($cep) || $cep == "" || strlen($cep) != 8) {
-            echo "Digite um CEP válido (somente números e com 8 dígitos)";
-            return false;
-        }
-
-        $result = findCEP($cep);
-
-        // se informações existirem no banco de dados local, faz uso dos dados locais,
-        // caso não exista fzz a consulta na API viacep
-        if ($result['error'] === false) {
-            // $reponse = [];
-            // $reponse['api'] = 'local';
-            // $reponse['cep'] = $result['cep'];
-            // $reponse['logradouro'] = $result['logradouro'];
-            // $reponse['bairro'] = $result['nome_bairro'];
-            // $reponse['localidade'] = $result['nome_cidade'];
-            // $reponse['uf'] = $result['nome_uf'];
-            // $reponse['pais'] = $result['nome_pais'];
-            $response_data = $result;
-        } else {
-            $url = 'https://viacep.com.br/ws/' . $cep . '/json/';
-            $ch = curl_init($url);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, array('Accept: application/json'));       
-            $response = curl_exec($ch);
-            
-            if($response === false){
-                $response_data = ['error' => true, 'message' => "Ocorreu um erro ao executar a requisição: " . curl_error($ch), 'data' => null];
-            } else {
-                $reponse['api'] = 'viacep';                
-                $reponse['pais'] = 'Brasil';
-                $data = json_decode($response, true);
-                // var_dump($data);
-                $response_data = ['error' => false, 'message' => "Sucesso ao executar a requisição.", 'data' => $data];            
-            }
-            
-            curl_close($ch);
-        }
-
-        $response_data = ['error' => false, 'message' => '' , 'data' => $response_data] ;
-
-        echo json_encode($response_data);
+        searchLocalZipcodeExternalApi($_GET['procurarcep']);
     } else {
         echo "Parâmetro 'procurarcep' não encontrado na URL";
     }
-
 
 } elseif ($method === 'POST') {
     // Lógica para lidar com solicitações POST
