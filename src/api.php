@@ -45,13 +45,11 @@ function searchLocalZipcodeExternalApi($cep) {
             $reponse['pais'] = 'Brasil';
             
             // var_dump($data);
-            $response_data = ['error' => false, 'message' => "Sucesso ao executar a requisição.", 'data' => $data];            
+            $response_data = ['error' => false, 'message' => "Sucesso ao executar a requisição.", 'data' => json_decode($response, true)];            
         }
         
         curl_close($ch);
     }
-
-    $response_data = ['error' => false, 'message' => '' , 'data' => $response_data] ;
 
     echo json_encode($response_data);
 
@@ -119,8 +117,12 @@ function findCEP($cep) {
 function insertCEP($jsonData) {
 return false;
     // Dados do JSON
-    // $jsonData = '{"error":false,"message":"","data":{"error":false,"message":"Sucesso ao executar a requisi\u00e7\u00e3o.","data":{"cep":"35162-289","logradouro":"Avenida Orqu\u00eddea","complemento":"at\u00e9 328\/329","bairro":"Esperan\u00e7a","localidade":"Ipatinga","uf":"MG","ibge":"3131307","gia":"","ddd":"31","siafi":"4625"}}}';
-    
+    /* $jsonData = '{"error":false,"message":"","data":
+        {"error":false,"message":"Sucesso ao executar a requisi\u00e7\u00e3o.",
+            "data":{"cep":"35162-289","logradouro":"Avenida Orqu\u00eddea","complemento":"at\u00e9 328\/329","bairro":"Esperan\u00e7a","localidade":"Ipatinga","uf":"MG","ibge":"3131307","gia":"","ddd":"31","siafi":"4625"}
+    }
+    }';
+*/    
     // Decodificar o JSON
     $data = json_decode($jsonData, true);
     
