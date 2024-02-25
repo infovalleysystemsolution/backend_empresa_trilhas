@@ -43,7 +43,8 @@ function searchLocalZipcodeExternalApi($cep) {
             $responseInsert = insertCEP($data['data']);
             $reponse['api'] = 'viacep';                
             $reponse['pais'] = 'Brasil';
-            
+            // Inserir dados da CEP na base de dados  local
+            insertCEP($data);
             // var_dump($data);
             $response_data = ['error' => false, 'message' => "Sucesso ao executar a requisição.", 'data' => json_decode($response, true)];            
         }
@@ -115,6 +116,9 @@ function findCEP($cep) {
 
 
 function insertCEP($jsonData) {
+
+    echo json_decode(" em função insertCEP: ".$jsonData, true);
+
 return false;
     // Dados do JSON
     /* $jsonData = '{"error":false,"message":"","data":
