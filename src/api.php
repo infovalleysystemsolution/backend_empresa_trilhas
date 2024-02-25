@@ -40,11 +40,11 @@ function searchLocalZipcodeExternalApi($cep) {
         } else {
 
             $data = json_decode($response, true);
+            // Inserir dados da CEP na base de dados  local            
             $responseInsert = insertCEP($data);
 
             $data['api'] = 'viacep';                
             $data['pais'] = 'Brasil';
-            // Inserir dados da CEP na base de dados  local
 
             // var_dump($data);
             $response_data = ['error' => false, 'message' => "Sucesso ao executar a requisição.", 'data' => json_decode($response, true)];            
@@ -116,13 +116,9 @@ function findCEP($cep) {
 }
 
 
-function insertCEP($jsonData) {
+function insertCEP($data) {
 
-    $jsonData[ "insertCEP"] = true;
-    echo json_encode($jsonData);
 
-exit;
-return false;
     // Dados do JSON
     /* $jsonData = '{"error":false,"message":"","data":
         {"error":false,"message":"Sucesso ao executar a requisi\u00e7\u00e3o.",
@@ -130,18 +126,26 @@ return false;
     }
     }';
 */    
-    // Decodificar o JSON
-    $data = json_decode($jsonData, true);
-    
+$data[ "insertCEP"] = true;
+
+
     // Extrair informações relevantes
-    $cep = $data['data']['data']['cep'];
-    $logradouro = $data['data']['data']['logradouro'];
-    $complemento = $data['data']['data']['complemento'];
-    $bairro = $data['data']['data']['bairro'];
-    $localidade = $data['data']['data']['localidade'];
-    $uf = $data['data']['data']['uf'];
-    $ibge = $data['data']['data']['ibge'];
-    $ddd = $data['data']['data']['ddd'];
+    $cep = $data['cep'];
+    $logradouro = $data['logradouro'];
+    $complemento = $data['complemento'];
+    $bairro = $data['bairro'];
+    $localidade = $data['localidade'];
+    $uf = $data['uf'];
+    $ibge = $data['ibge'];
+    $ddd = $data['ddd'];
+
+
+echo json_encode($localidade);
+
+exit;
+return false;
+    
+
     
     try {
         // Preparar a consulta para inserir na tabela 'pais'
