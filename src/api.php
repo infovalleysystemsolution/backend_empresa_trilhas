@@ -117,7 +117,8 @@ function findCEP($cep) {
 
 function insertCEP($jsonData) {
 
-    echo json_decode(" em função insertCEP: ".$jsonData, true);
+    echo json_encode(" em função insertCEP: ".$jsonData, true);
+    
 exit;
 return false;
     // Dados do JSON
