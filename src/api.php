@@ -184,7 +184,7 @@ function findPais($dados) {
 
         if ($conn != null) {
             $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':pais', $dados['nome'], PDO::PARAM_STR);
+            $stmt->bindParam(':pais', $dados['nome_pais'], PDO::PARAM_STR);
             $stmt->execute();
     
             // Obter resultados
@@ -693,7 +693,8 @@ function insertCEP($data) {
         $ddd = $data['ddd'];
 
         // Pegar id País function findPais($dados) {
-        $reponse_pais = findPais('Brasil');
+        $data['nome_pais'] = 'Brasil';    
+        $reponse_pais = findPais($data);
         $data['pais_id'] = $paisId = $reponse_pais['id'];
         // Pegar id Estado function findPais($dados) {
         $reponse_estado = findEstado($data['uf']);
