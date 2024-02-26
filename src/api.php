@@ -693,8 +693,7 @@ function insertCEP($data) {
         $ddd = $data['ddd'];
 
         // Pegar id País function findPais($dados) {
-        $dados['nome'] = 'Brasil';
-        $reponse_pais = findPais($dados['nome'] );
+        $reponse_pais = findPais('Brasil');
         $data['pais_id'] = $paisId = $reponse_pais['id'];
         // Pegar id Estado function findPais($dados) {
         $reponse_estado = findEstado($data['uf']);
