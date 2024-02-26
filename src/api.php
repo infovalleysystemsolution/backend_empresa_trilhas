@@ -47,14 +47,14 @@ function searchLocalZipcodeExternalApi($cep) {
             $data['pais'] = 'Brasil';
 
             // var_dump($data);
-            $response_data = ['error' => false, 'message' => "Sucesso ao executar a requisição.", 'data' => json_decode($response, true)];            
+            $response_data = [
+                'error' => false, 'message' => "Sucesso ao executar a requisição.", 'data' => $data
+            ];
         }
         
         curl_close($ch);
     }
-
     echo json_encode($response_data);
-
 }
 
 function findCEP($cep) {
@@ -115,48 +115,611 @@ function findCEP($cep) {
 
 }
 
+function findInsertPais($dados) {
 
-function insertCEP($data) {
-
-
-    // Dados do JSON
-    /* $jsonData = '{"error":false,"message":"","data":
-        {"error":false,"message":"Sucesso ao executar a requisi\u00e7\u00e3o.",
-            "data":{"cep":"35162-289","logradouro":"Avenida Orqu\u00eddea","complemento":"at\u00e9 328\/329","bairro":"Esperan\u00e7a","localidade":"Ipatinga","uf":"MG","ibge":"3131307","gia":"","ddd":"31","siafi":"4625"}
-    }
-    }';
-*/    
-$data[ "insertCEP"] = true;
-
-
-    // Extrair informações relevantes
-    $cep = $data['cep'];
-    $logradouro = $data['logradouro'];
-    $complemento = $data['complemento'];
-    $bairro = $data['bairro'];
-    $localidade = $data['localidade'];
-    $uf = $data['uf'];
-    $ibge = $data['ibge'];
-    $ddd = $data['ddd'];
-
-
-echo json_encode($localidade);
-
-exit;
-return false;
-    
-
+    // Consulta SQL com joins para obter os dados desejados
+    $sql = "SELECT id, nome, sigla FROM pais WHERE nome = :pais    ";
     
     try {
-        // Preparar a consulta para inserir na tabela 'pais'
-        $stmt = $conn->prepare("INSERT INTO pais (nome, sigla) VALUES (:nome, :sigla)");
-        $stmt->bindParam(':nome', $data['data']['data']['localidade']);
-        $stmt->bindParam(':sigla', $data['data']['data']['uf']);
-        $stmt->execute();
+
+        $conn = conectBD();
+        $countFound = 0;
+
+        if ($conn != null) {
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam(':nome', $dados['nome'], PDO::PARAM_STR);
+            $stmt->execute();
     
-        // Recuperar o ID inserido na tabela 'pais'
-        $paisId = $conn->lastInsertId();
+            // Obter resultados
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
     
+            // retorna os resultados
+            if ($countFound = count($result) > 0) {
+                return [
+                    'error' => false, 'message' => "API local encontrou informações País no BD.", 
+                    'record_found' => $countFound, 'id' => $result['id'], 'nome' => $result['nome'], 'sigla' => $result['sigla']
+                ];
+            } else {
+                $countFound = 0;
+
+                // Preparar a consulta para inserir na tabela 'pais'
+                $stmt = $conn->prepare("INSERT INTO pais (nome, sigla, continente) VALUES (:nome, :sigla, :continente)");
+                $stmt->bindParam(':nome', $dados['nome']);
+                $stmt->bindParam(':sigla', $dados['sigla']);
+                $stmt->bindParam(':continente', $dados['continente']);
+                $stmt->execute();
+            
+                // Recuperar o ID inserido na tabela 'pais'
+                $paisId = $conn->lastInsertId();
+
+                return [
+                    'error' => true, 'message' => "API local não encontrou informações CEP no BD.", 
+                    'record_found' => $countFound, 'id' => $paisId, 'nome' => $dados['nome'], 'sigla' => $dados['sigla']
+                ];
+            }
+        } else {
+            return ['error' => true, 'message' => "Conexão falhou.", 'record_found' => $countFound,  'data' => null];
+        }
+
+    } catch (PDOException $e) {
+        return "Erro na consulta: " . $e->getMessage();
+    }
+}
+
+
+function findPais($dados) {
+
+    // Consulta SQL com joins para obter os dados desejados
+    $sql = "SELECT id, nome, sigla FROM pais WHERE nome = :pais    ";
+    
+    try {
+
+        $conn = conectBD();
+        $countFound = 0;
+
+        if ($conn != null) {
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam(':pais', $dados['nome'], PDO::PARAM_STR);
+            $stmt->execute();
+    
+            // Obter resultados
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+            // retorna os resultados
+            if ($countFound = count($result) > 0) {
+                return [
+                    'error' => false, 'message' => "API local encontrou informações País no BD.", 
+                    'record_found' => $countFound, 'id' => $result['id'], 'nome' => $result['nome'], 'sigla' => $result['sigla']
+                ];
+            } else {
+                $countFound = 0;
+
+                return [
+                    'error' => true, 'message' => "API local não encontrou informações CEP no BD.", 
+                    'record_found' => $countFound
+                ];
+            }
+        } else {
+            return ['error' => true, 'message' => "Conexão falhou.", 'record_found' => $countFound,  'data' => null];
+        }
+
+    } catch (PDOException $e) {
+        return "Erro na consulta: " . $e->getMessage();
+    }
+}
+
+function findInsertEstado($dados) {
+/*
+CREATE TABLE `uf` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `id_uf` bigint(20) DEFAULT NULL,
+  `nome` varchar(255) DEFAULT NULL,
+  `sigla` varchar(5) DEFAULT NULL,
+  `ibge` int(2) DEFAULT NULL,
+  `country_id` bigint(20) DEFAULT NULL,
+  `ddd` varchar(50) DEFAULT NULL,
+  `capital` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `country_id` (`country_id`),
+  CONSTRAINT `uf_ibfk_1` FOREIGN KEY (`country_id`) REFERENCES `pais` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4;
+*/
+    // Consulta SQL com joins para obter os dados desejados
+    $sql = "SELECT id, nome, sigla, country_id FROM uf WHERE nome = :nome    ";
+    
+    try {
+
+        $conn = conectBD();
+        $countFound = 0;
+
+        if ($conn != null) {
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam(':nome', $dados['nome'], PDO::PARAM_STR);
+            $stmt->execute();
+    
+            // Obter resultados
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+            // retorna os resultados
+            if ($countFound = count($result) > 0) {
+                return [
+                    'error' => false, 'message' => "API local encontrou informações Estado no BD.", 
+                    'record_found' => $countFound, 'id' => $result['id'], 'nome' => $result['nome'], 'sigla' => $result['sigla'], 'country_id' => $result['country_id']
+                ];
+            } else {
+                $countFound = 0;
+
+                // Preparar a consulta para inserir na tabela 'pais'
+                $stmt = $conn->prepare("INSERT INTO uf (nome, sigla, country_id) VALUES (:nome, :sigla, :country_id)");
+                $stmt->bindParam(':nome', $dados['nome']);
+                $stmt->bindParam(':sigla', $dados['sigla']);
+                $stmt->bindParam(':country_id', $dados['country_id']);
+                $stmt->execute();
+            
+                // Recuperar o ID inserido na tabela 'pais'
+                $estadoId = $conn->lastInsertId();
+
+                return [
+                    'error' => true, 'message' => "API local não encontrou informações Estado no BD.", 
+                    'record_found' => $countFound, 'id' => $estadoId, 'nome' => $dados['nome'], 'sigla' => $dados['sigla'], 
+                    'country_id' => $dados['country_id']
+                ];
+            }
+        } else {
+            return ['error' => true, 'message' => "Conexão falhou.", 'record_found' => $countFound,  'data' => null];
+        }
+
+    } catch (PDOException $e) {
+        return "Erro na consulta: " . $e->getMessage();
+    }
+}
+
+function findEstado($dados) {
+    /*
+    CREATE TABLE `uf` (
+      `id` bigint(20) NOT NULL AUTO_INCREMENT,
+      `id_uf` bigint(20) DEFAULT NULL,
+      `nome` varchar(255) DEFAULT NULL,
+      `sigla` varchar(5) DEFAULT NULL,
+      `ibge` int(2) DEFAULT NULL,
+      `country_id` bigint(20) DEFAULT NULL,
+      `ddd` varchar(50) DEFAULT NULL,
+      `capital` varchar(255) DEFAULT NULL,
+      PRIMARY KEY (`id`),
+      KEY `country_id` (`country_id`),
+      CONSTRAINT `uf_ibfk_1` FOREIGN KEY (`country_id`) REFERENCES `pais` (`id`)
+    ) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4;
+    */
+        // Consulta SQL com joins para obter os dados desejados
+        $sql = "SELECT id, nome, sigla, country_id FROM uf WHERE nome = :nome    ";
+        
+        try {
+    
+            $conn = conectBD();
+            $countFound = 0;
+    
+            if ($conn != null) {
+                $stmt = $conn->prepare($sql);
+                $stmt->bindParam(':nome', $dados['nome'], PDO::PARAM_STR);
+                $stmt->execute();
+        
+                // Obter resultados
+                $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+                // retorna os resultados
+                if ($countFound = count($result) > 0) {
+                    return [
+                        'error' => false, 'message' => "API local encontrou informações Estado no BD.", 
+                        'record_found' => $countFound, 'id' => $result['id'], 'nome' => $result['nome'], 'sigla' => $result['sigla'], 
+                        'country_id' => $result['country_id']
+                    ];
+                } else {
+                    $countFound = 0;
+    
+                    return [
+                        'error' => true, 'message' => "API local não encontrou informações Estado no BD.", 
+                        'record_found' => $countFound
+                    ];
+                }
+            } else {
+                return ['error' => true, 'message' => "Conexão falhou.", 'record_found' => $countFound,  'data' => null];
+            }
+    
+        } catch (PDOException $e) {
+            return "Erro na consulta: " . $e->getMessage();
+        }
+}
+
+function findInsertCidade($dados) {
+        /*
+CREATE TABLE `cidade` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `nome` varchar(255) DEFAULT NULL,
+  `ddd` varchar(5) DEFAULT NULL,
+  `uf_id` bigint(20) DEFAULT NULL,
+  `ibge` int(7) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `uf_id` (`uf_id`),
+  CONSTRAINT `cidade_ibfk_1` FOREIGN KEY (`uf_id`) REFERENCES `uf` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5610 DEFAULT CHARSET=utf8mb4;
+        */
+            // Consulta SQL com joins para obter os dados desejados
+            $sql = "SELECT id, nome, uf_id FROM cidade WHERE nome = :nome    ";
+            
+            try {
+        
+                $conn = conectBD();
+                $countFound = 0;
+        
+                if ($conn != null) {
+                    $stmt = $conn->prepare($sql);
+                    $stmt->bindParam(':nome', $dados['nome'], PDO::PARAM_STR);
+                    $stmt->execute();
+            
+                    // Obter resultados
+                    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+                    // retorna os resultados
+                    if ($countFound = count($result) > 0) {
+                        return [
+                            'error' => false, 'message' => "API local encontrou informações da Cidade no BD.", 
+                            'record_found' => $countFound, 'id' => $result['id'], 'nome' => $result['nome'], 'sigla' => $result['sigla'], 
+                            'uf_id' => $result['uf_id']
+                        ];
+                    } else {
+                        $countFound = 0;
+        
+                        // Preparar a consulta para inserir na tabela 'pais'
+                        $stmt = $conn->prepare("INSERT INTO pais (nome, sigla, uf_id) VALUES (:nome, :sigla, :uf_id)");
+                        $stmt->bindParam(':nome', $dados['nome']);
+                        $stmt->bindParam(':sigla', $dados['sigla']);
+                        $stmt->bindParam(':uf_id', $dados['uf_id']);
+                        $stmt->execute();
+                    
+                        // Recuperar o ID inserido na tabela 'pais'
+                        $estadoId = $conn->lastInsertId();
+        
+                        return [
+                            'error' => true, 'message' => "API local não encontrou informações Estado no BD.", 
+                            'record_found' => $countFound, 'id' => $estadoId, 'nome' => $dados['nome'], 'sigla' => $dados['sigla'], 'uf_id' => $dados['uf_id']
+                        ];
+                    }
+                } else {
+                    return ['error' => true, 'message' => "Conexão falhou.", 'record_found' => $countFound,  'data' => null];
+                }
+        
+            } catch (PDOException $e) {
+                return "Erro na consulta: " . $e->getMessage();
+            }
+}
+
+function findCidade($dados) {
+    /*
+CREATE TABLE `cidade` (
+`id` bigint(20) NOT NULL AUTO_INCREMENT,
+`nome` varchar(255) DEFAULT NULL,
+`ddd` varchar(5) DEFAULT NULL,
+`uf_id` bigint(20) DEFAULT NULL,
+`ibge` int(7) DEFAULT NULL,
+PRIMARY KEY (`id`),
+KEY `uf_id` (`uf_id`),
+CONSTRAINT `cidade_ibfk_1` FOREIGN KEY (`uf_id`) REFERENCES `uf` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5610 DEFAULT CHARSET=utf8mb4;
+    */
+        // Consulta SQL com joins para obter os dados desejados
+        $sql = "SELECT id, nome, uf_id FROM cidade WHERE nome = :nome    ";
+        
+        try {
+    
+            $conn = conectBD();
+            $countFound = 0;
+    
+            if ($conn != null) {
+                $stmt = $conn->prepare($sql);
+                $stmt->bindParam(':nome', $dados['nome'], PDO::PARAM_STR);
+                $stmt->execute();
+        
+                // Obter resultados
+                $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+                // retorna os resultados
+                if ($countFound = count($result) > 0) {
+                    return [
+                        'error' => false, 'message' => "API local encontrou informações da Cidade no BD.", 
+                        'record_found' => $countFound, 'id' => $result['id'], 'nome' => $result['nome'], 'sigla' => $result['sigla'], 
+                        'uf_id' => $result['uf_id']
+                    ];
+                } else {
+                    $countFound = 0;
+    
+                    return [
+                        'error' => true, 'message' => "API local não encontrou informações Estado no BD.", 
+                        'record_found' => $countFound
+                    ];
+                }
+            } else {
+                return ['error' => true, 'message' => "Conexão falhou.", 'record_found' => $countFound,  'data' => null];
+            }
+    
+        } catch (PDOException $e) {
+            return "Erro na consulta: " . $e->getMessage();
+        }
+}
+
+function findInsertBairro($dados) {
+/*
+CREATE TABLE `bairro` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `nome` varchar(255) DEFAULT NULL,
+  `cidade_id` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `cidade_id` (`cidade_id`),
+  CONSTRAINT `bairro_ibfk_1` FOREIGN KEY (`cidade_id`) REFERENCES `cidade` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+*/
+        // Consulta SQL com joins para obter os dados desejados
+        $sql = "SELECT id, nome, cidade_id FROM bairro WHERE nome = :nome    ";
+        
+        try {
+    
+            $conn = conectBD();
+            $countFound = 0;
+    
+            if ($conn != null) {
+                $stmt = $conn->prepare($sql);
+                $stmt->bindParam(':nome', $dados['nome'], PDO::PARAM_STR);
+                $stmt->execute();
+        
+                // Obter resultados
+                $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+                // retorna os resultados
+                if ($countFound = count($result) > 0) {
+                    return [
+                        'error' => false, 'message' => "API local encontrou informações da Cidade no BD.", 
+                        'record_found' => $countFound, 'id' => $result['id'], 'nome' => $result['nome'], 'sigla' => $result['sigla'], 
+                        'cidade_id' => $result['cidade_id']
+                    ];
+                } else {
+                    $countFound = 0;
+    
+                    // Preparar a consulta para inserir na tabela 'pais'
+                    $stmt = $conn->prepare("INSERT INTO bairro (nome, sigla, uf_id) VALUES (:nome, :sigla, :cidade_id)");
+                    $stmt->bindParam(':nome', $dados['nome']);
+                    $stmt->bindParam(':sigla', $dados['sigla']);
+                    $stmt->bindParam(':cidade_id', $dados['cidade_id']);
+                    $stmt->execute();
+                
+                    // Recuperar o ID inserido na tabela 'pais'
+                    $estadoId = $conn->lastInsertId();
+    
+                    return [
+                        'error' => true, 'message' => "API local não encontrou informações Estado no BD.", 
+                        'record_found' => $countFound, 'id' => $estadoId, 'nome' => $dados['nome'], 'sigla' => $dados['sigla'], 'uf_id' => $dados['uf_id']
+                    ];
+                }
+            } else {
+                return ['error' => true, 'message' => "Conexão falhou.", 'record_found' => $countFound,  'data' => null];
+            }
+    
+        } catch (PDOException $e) {
+            return "Erro na consulta: " . $e->getMessage();
+        }
+}
+
+function findInsertLogradouro($dados) {
+/*
+CREATE TABLE `logradouro` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `cep` varchar(10) DEFAULT NULL,
+  `logradouro` varchar(255) DEFAULT NULL,
+  `bairro_id` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_cep` (`cep`),
+  KEY `bairro_id` (`bairro_id`),
+  CONSTRAINT `logradouro_ibfk_1` FOREIGN KEY (`bairro_id`) REFERENCES `bairro` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+*/
+            // Consulta SQL com joins para obter os dados desejados
+            $sql = "SELECT id, logradouro, cep, bairro_id FROM logradouro WHERE nome = :nome    ";
+            
+            try {
+        
+                $conn = conectBD();
+                $countFound = 0;
+        
+                if ($conn != null) {
+                    $stmt = $conn->prepare($sql);
+                    $stmt->bindParam(':nome', $dados['nome'], PDO::PARAM_STR);
+                    $stmt->execute();
+            
+                    // Obter resultados
+                    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+                    // retorna os resultados
+                    if ($countFound = count($result) > 0) {
+                        return [
+                            'error' => false, 'message' => "API local encontrou informações da Cidade no BD.", 
+                            'record_found' => $countFound, 'id' => $result['id'], 'logradouro' => $result['logradouro'], 'cep' => $result['cep'], 
+                            'bairro_id' => $result['bairro_id']
+                        ];
+                    } else {
+                        $countFound = 0;
+        
+                        // Preparar a consulta para inserir na tabela 'pais'
+                        $stmt = $conn->prepare("INSERT INTO logradouro (logradouro, cep, uf_id) VALUES (:logradouro, :cep, :cidade_id)");
+                        $stmt->bindParam(':logradouro', $dados['logradouro']);
+                        $stmt->bindParam(':cep', $dados['cep']);
+                        $stmt->bindParam(':bairro_id', $dados['bairro_id']);
+                        $stmt->execute();
+                    
+                        // Recuperar o ID inserido na tabela 'pais'
+                        $estadoId = $conn->lastInsertId();
+        
+                        return [
+                            'error' => true, 'message' => "API local não encontrou informações Estado no BD.", 
+                            'record_found' => $countFound, 'id' => $estadoId, 'nome' => $dados['nome'], 'cep' => $dados['cep'], 'bairro_id' => $dados['bairro_id']
+                        ];
+                    }
+                } else {
+                    return ['error' => true, 'message' => "Conexão falhou.", 'record_found' => $countFound,  'data' => null];
+                }
+        
+            } catch (PDOException $e) {
+                return "Erro na consulta: " . $e->getMessage();
+            }
+}
+
+function findLogradouro($dados) {
+    /*
+    CREATE TABLE `logradouro` (
+      `id` bigint(20) NOT NULL AUTO_INCREMENT,
+      `cep` varchar(10) DEFAULT NULL,
+      `logradouro` varchar(255) DEFAULT NULL,
+      `bairro_id` bigint(20) DEFAULT NULL,
+      PRIMARY KEY (`id`),
+      KEY `idx_cep` (`cep`),
+      KEY `bairro_id` (`bairro_id`),
+      CONSTRAINT `logradouro_ibfk_1` FOREIGN KEY (`bairro_id`) REFERENCES `bairro` (`id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    */
+                // Consulta SQL com joins para obter os dados desejados
+                $sql = "SELECT id, logradouro, cep, bairro_id FROM logradouro WHERE nome = :nome    ";
+                
+                try {
+            
+                    $conn = conectBD();
+                    $countFound = 0;
+            
+                    if ($conn != null) {
+                        $stmt = $conn->prepare($sql);
+                        $stmt->bindParam(':nome', $dados['nome'], PDO::PARAM_STR);
+                        $stmt->execute();
+                
+                        // Obter resultados
+                        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                
+                        // retorna os resultados
+                        if ($countFound = count($result) > 0) {
+                            return [
+                                'error' => false, 'message' => "API local encontrou informações da Cidade no BD.", 
+                                'record_found' => $countFound, 'id' => $result['id'], 'logradouro' => $result['logradouro'], 'cep' => $result['cep'], 
+                                'bairro_id' => $result['bairro_id']
+                            ];
+                        } else {
+                            $countFound = 0;
+            
+                            return [
+                                'error' => true, 'message' => "API local não encontrou informações Estado no BD.", 
+                                'record_found' => $countFound
+                            ];
+                        }
+                    } else {
+                        return ['error' => true, 'message' => "Conexão falhou.", 'record_found' => $countFound,  'data' => null];
+                    }
+            
+                } catch (PDOException $e) {
+                    return "Erro na consulta: " . $e->getMessage();
+                }
+}
+
+function findBairro($dados) {
+    /*
+    CREATE TABLE `bairro` (
+      `id` bigint(20) NOT NULL AUTO_INCREMENT,
+      `nome` varchar(255) DEFAULT NULL,
+      `cidade_id` bigint(20) DEFAULT NULL,
+      PRIMARY KEY (`id`),
+      KEY `cidade_id` (`cidade_id`),
+      CONSTRAINT `bairro_ibfk_1` FOREIGN KEY (`cidade_id`) REFERENCES `cidade` (`id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    */
+            // Consulta SQL com joins para obter os dados desejados
+            $sql = "SELECT id, nome, cidade_id FROM bairro WHERE nome = :nome    ";
+            
+            try {
+        
+                $conn = conectBD();
+                $countFound = 0;
+        
+                if ($conn != null) {
+                    $stmt = $conn->prepare($sql);
+                    $stmt->bindParam(':nome', $dados['nome'], PDO::PARAM_STR);
+                    $stmt->execute();
+            
+                    // Obter resultados
+                    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+                    // retorna os resultados
+                    if ($countFound = count($result) > 0) {
+                        return [
+                            'error' => false, 'message' => "API local encontrou informações da Cidade no BD.", 
+                            'record_found' => $countFound, 'id' => $result['id'], 'nome' => $result['nome'], 'sigla' => $result['sigla'], 
+                            'cidade_id' => $result['cidade_id']
+                        ];
+                    } else {
+                        $countFound = 0;
+        
+                        return [
+                            'error' => true, 'message' => "API local não encontrou informações Estado no BD.", 
+                            'record_found' => $countFound
+                        ];
+                    }
+                } else {
+                    return ['error' => true, 'message' => "Conexão falhou.", 'record_found' => $countFound,  'data' => null];
+                }
+        
+            } catch (PDOException $e) {
+                return "Erro na consulta: " . $e->getMessage();
+            }
+}
+
+function insertCEP($data) { 
+    
+    try {
+        // Extrair informações relevantes
+        $cep = $data['cep'];
+        $logradouro = $data['logradouro'];
+        $complemento = $data['complemento'];
+        $bairro = $data['bairro'];
+        $localidade = $data['localidade'];
+        $uf = $data['uf'];
+        $ibge = $data['ibge'];
+        $ddd = $data['ddd'];
+
+        // Pegar id País function findPais($dados) {
+        $dados['nome'] = 'Brasil';
+        $reponse_pais = findPais($dados['nome'] );
+        $paisId = $reponse_pais['id'];
+        // Pegar id Estado function findPais($dados) {
+        $reponse_estado = findEstado($data['uf']);
+        $estadoId = $reponse_estado['id'];
+        // Pegar id Cidade ou cadastrar Cidade
+        $dadosCidade['nome'] = $data['localidade'];
+        $dadosCidade['uf_id'] = $estadoId;
+        $reponse_cidade = findInsertCidade($dadosCidade);
+        $cidadeId = $reponse_cidade['id'];
+        // Pegar id Bairro ou cadastrar Bairro
+        $dadosBairro['nome'] = $data['bairro'];
+        $dadosBairro['cidade_id'] = $cidadeId;
+        $reponse_bairro = findInsertBairro($dadosBairro);   
+        $bairroId = $reponse_bairro['id'];
+        // Pegar id Logradouro ou cadastrar Logradouro
+        $dadosLogradouro['logradouro'] = $data['logradouro'];    
+        $dadosLogradouro['bairro_id'] = $bairroId;    
+        $reponse_logradouro = findInsertLogradouro($dadosCidade);
+
+        return true;
+    
+    } catch (PDOException $e) {
+        return [ "error" => true, "message" => "Erro: " . $e->getMessage() ];
+    }
+}
+
+
+/*
+
+        $stmt->execute();    
         // Preparar a consulta para inserir na tabela 'uf'
         $stmt = $conn->prepare("INSERT INTO uf (nome, sigla, country_id) VALUES (:nome, :sigla, :country_id)");
         $stmt->bindParam(':nome', $data['data']['data']['uf']);
@@ -190,12 +753,4 @@ return false;
         $stmt->bindParam(':cep', $cep);
         $stmt->bindParam(':logradouro', $logradouro);
         $stmt->bindParam(':bairro_id', $bairroId);
-        $stmt->execute();
-    
-        echo "Dados inseridos com sucesso.";
-    
-    } catch (PDOException $e) {
-        echo "Erro: " . $e->getMessage();
-    }   
-
-}
+*/
