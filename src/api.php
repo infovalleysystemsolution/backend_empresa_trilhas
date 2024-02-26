@@ -45,11 +45,16 @@ function searchLocalZipcodeExternalApi($cep) {
 
             // Inserir dados da CEP na base de dados  local            
             $responseInsert = insertCEP($data);
-            
-            // var_dump($data);
+
             $response_data = [
-                'error' => false, 'message' => "Sucesso ao executar a requisição.", 'data' => $responseInsert['data']
-            ];
+                'error' => true, 'message' => "Falhou o processamento da requisição.", 'data' => []
+            ];              
+            // var_dump($data);
+            if ($responseInsert['error'] == false) {
+                $response_data = [
+                    'error' => false, 'message' => "Sucesso ao executar a requisição.", 'data' => $responseInsert['data']
+                ];                
+            }
         }
         
         curl_close($ch);
@@ -690,25 +695,25 @@ function insertCEP($data) {
         // Pegar id País function findPais($dados) {
         $dados['nome'] = 'Brasil';
         $reponse_pais = findPais($dados['nome'] );
-        $paisId = $reponse_pais['id'];
+        $data['pais_id'] = $paisId = $reponse_pais['id'];
         // Pegar id Estado function findPais($dados) {
         $reponse_estado = findEstado($data['uf']);
-        $estadoId = $reponse_estado['id'];
+        $data['estado_id'] = $estadoId = $reponse_estado['id'];
         // Pegar id Cidade ou cadastrar Cidade
         $dadosCidade['nome'] = $data['localidade'];
-        $dadosCidade['uf_id'] = $estadoId;
+        $data['uf_id'] = $dadosCidade['uf_id'] = $estadoId;
         $reponse_cidade = findInsertCidade($dadosCidade);
         $cidadeId = $reponse_cidade['id'];
         // Pegar id Bairro ou cadastrar Bairro
         $dadosBairro['nome'] = $data['bairro'];
-        $dadosBairro['cidade_id'] = $cidadeId;
+        $data['cidade_id'] = $dadosBairro['cidade_id'] = $cidadeId;
         $reponse_bairro = findInsertBairro($dadosBairro);   
         $bairroId = $reponse_bairro['id'];
         // Pegar id Logradouro ou cadastrar Logradouro
         $dadosLogradouro['logradouro'] = $data['logradouro'];    
-        $dadosLogradouro['bairro_id'] = $bairroId;    
+        $data['bairro_id'] = $dadosLogradouro['bairro_id'] = $bairroId;
         $reponse_logradouro = findInsertLogradouro($dadosCidade);
-
+        $data['logradouro_id'] = $reponse_logradouro['id'];
         return ["error" => false, "data" => $data ];
     
     } catch (PDOException $e) {
