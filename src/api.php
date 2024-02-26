@@ -40,15 +40,15 @@ function searchLocalZipcodeExternalApi($cep) {
         } else {
 
             $data = json_decode($response, true);
-            // Inserir dados da CEP na base de dados  local            
-            $responseInsert = insertCEP($data);
-
             $data['api'] = 'viacep';                
             $data['pais'] = 'Brasil';
 
+            // Inserir dados da CEP na base de dados  local            
+            $responseInsert = insertCEP($data);
+            
             // var_dump($data);
             $response_data = [
-                'error' => false, 'message' => "Sucesso ao executar a requisição.", 'data' => $data
+                'error' => false, 'message' => "Sucesso ao executar a requisição.", 'data' => $responseInsert['data']
             ];
         }
         
@@ -709,7 +709,7 @@ function insertCEP($data) {
         $dadosLogradouro['bairro_id'] = $bairroId;    
         $reponse_logradouro = findInsertLogradouro($dadosCidade);
 
-        return true;
+        return ["error" => false, "data" => $data ];
     
     } catch (PDOException $e) {
         return [ "error" => true, "message" => "Erro: " . $e->getMessage() ];
