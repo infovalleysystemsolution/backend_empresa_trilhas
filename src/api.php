@@ -188,7 +188,7 @@ function findPais($dados) {
 
         if ($conn != null) {
             $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':pais', $dados['nome_pais'], PDO::PARAM_STR);
+            $stmt->bindParam(':pais', $dados['pais_nome'], PDO::PARAM_STR);
             $stmt->execute();
     
             // contando os registros retornados
@@ -353,70 +353,75 @@ function findEstado($dados) {
 }
 
 function findInsertCidade($dados) {
-        /*
-CREATE TABLE `cidade` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `nome` varchar(255) DEFAULT NULL,
-  `ddd` varchar(5) DEFAULT NULL,
-  `uf_id` bigint(20) DEFAULT NULL,
-  `ibge` int(7) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `uf_id` (`uf_id`),
-  CONSTRAINT `cidade_ibfk_1` FOREIGN KEY (`uf_id`) REFERENCES `uf` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5610 DEFAULT CHARSET=utf8mb4;
-        */
-            // Consulta SQL com joins para obter os dados desejados
-            $sql = "SELECT id, nome, uf_id FROM cidade WHERE nome = :nome    ";
-            
-            try {
-        
-                $conn = conectBD();
+    /*
+    Schema:
+        CREATE TABLE `cidade` (
+        `id` bigint(20) NOT NULL AUTO_INCREMENT,
+        `nome` varchar(255) DEFAULT NULL,
+        `ddd` varchar(5) DEFAULT NULL,
+        `uf_id` bigint(20) DEFAULT NULL,
+        `ibge` int(7) DEFAULT NULL,
+        PRIMARY KEY (`id`),
+        KEY `uf_id` (`uf_id`),
+        CONSTRAINT `cidade_ibfk_1` FOREIGN KEY (`uf_id`) REFERENCES `uf` (`id`)
+        ) ENGINE=InnoDB AUTO_INCREMENT=5610 DEFAULT CHARSET=utf8mb4;
+    */
+    // Consulta SQL com joins para obter os dados desejados  
+    $sql = "SELECT c.id As cidade_id, c.nome As cidade_nome, c.uf_id As estado_id, u.nome As estado_nome, 
+                u.sigla As estado_sigla, u.country_id As pais_id  
+            FROM cidade As c 
+            INNER JOIN uf As u on c.uf_id = u.id 
+            WHERE 
+            c.nome = :localidade";
+
+    try {
+
+        $conn = conectBD();
+        $countFound = 0;
+
+        if ($conn != null) {
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam(':localidade', $dados['localidade'], PDO::PARAM_STR);
+            $stmt->execute();
+
+            // contando os registros retornados
+            $countFound = $stmt->rowCount(); 
+
+            // retorna os resultados
+            if ($countFound > 0) {
+
+                // Obter resultados
+                $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                return [
+                    'error' => false, 'message' => "API local encontrou informações da Cidade no BD.", 
+                    'record_insert' => false,
+                    'record_found' => $countFound, 'id' => $result['cidade_id'], 'nome' => $result['cidade_nome']
+                ];
+            } else {
                 $countFound = 0;
-        
-                if ($conn != null) {
-                    $stmt = $conn->prepare($sql);
-                    $stmt->bindParam(':nome', $dados['nome'], PDO::PARAM_STR);
-                    $stmt->execute();
 
-                    // contando os registros retornados
-                    $countFound = $stmt->rowCount(); 
+                // Preparar a consulta para inserir na tabela 'pais'
+                $stmt = $conn->prepare("INSERT INTO cidade (nome, uf_id) VALUES (:nome, :uf_id)");
+                $stmt->bindParam(':nome', $dados['localidade']);
+                $stmt->bindParam(':uf_id', $dados['estado_id']);
+                $stmt->execute();
+            
+                // Recuperar o ID inserido na tabela 'pais'
+                $estadoId = $conn->lastInsertId();
 
-                    // retorna os resultados
-                    if ($countFound > 0) {
-
-                        // Obter resultados
-                        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-
-                        return [
-                            'error' => false, 'message' => "API local encontrou informações da Cidade no BD.", 
-                            'record_found' => $countFound, 'id' => $result['id'], 'nome' => $result['nome'], 'sigla' => $result['sigla'], 
-                            'uf_id' => $result['uf_id']
-                        ];
-                    } else {
-                        $countFound = 0;
-        
-                        // Preparar a consulta para inserir na tabela 'pais'
-                        $stmt = $conn->prepare("INSERT INTO pais (nome, sigla, uf_id) VALUES (:nome, :sigla, :uf_id)");
-                        $stmt->bindParam(':nome', $dados['nome']);
-                        $stmt->bindParam(':sigla', $dados['sigla']);
-                        $stmt->bindParam(':uf_id', $dados['uf_id']);
-                        $stmt->execute();
-                    
-                        // Recuperar o ID inserido na tabela 'pais'
-                        $estadoId = $conn->lastInsertId();
-        
-                        return [
-                            'error' => true, 'message' => "API local não encontrou informações Estado no BD.", 
-                            'record_found' => $countFound, 'id' => $estadoId, 'nome' => $dados['nome'], 'sigla' => $dados['sigla'], 'uf_id' => $dados['uf_id']
-                        ];
-                    }
-                } else {
-                    return ['error' => true, 'message' => "Conexão falhou.", 'record_found' => $countFound,  'data' => null];
-                }
-        
-            } catch (PDOException $e) {
-                return "Erro na consulta: " . $e->getMessage();
+                return [
+                    'error' => true, 'message' => "API local não encontrou informações Estado no BD.", 
+                    'record_insert' => true, 'id' => $estadoId, 'nome' => $dados['localidade'], 'uf_id' => $dados['estado_id']
+                ];
             }
+        } else {
+            return ['error' => true, 'message' => "Conexão falhou.", 'record_found' => $countFound,  'data' => null];
+        }
+
+    } catch (PDOException $e) {
+        return "Erro na consulta: " . $e->getMessage();
+    }
 }
 
 function findCidade($dados) {
@@ -735,27 +740,29 @@ function insertCEP($data) {
 
         // Pegar id País function findPais($dados) {
         $data['pais_nome'] = 'Brasil';    
-        $reponse_pais = findPais($data);
-        $data['pais_id'] = $paisId = $reponse_pais['id'];
-
+        $response_pais = findPais($data);
+        $data['pais_id'] = $response_pais['id'];
+        $data['pais_sigla'] = $response_pais['sigla'];
+        
         // Pegar id Estado function findPais($dados) {
         $response_estado = findEstado($data);
         $data['estado_id'] = $response_estado['id'];
         $data['estado_nome'] = $response_estado['nome'];
         $data['estado_sigla'] = $response_estado['sigla'];
 
-        echo json_encode($data);
+        // Pegar id Cidade ou cadastrar Cidade
+        $response_cidade = findInsertCidade($data);
+        $data['cidade_id'] = $response_cidade['id'];    
+        $data['cidade_nome'] = $response_cidade['nome'];   
+     
 
-exit;               
+echo json_encode($data);
+exit;
         
 
 
 
-        // Pegar id Cidade ou cadastrar Cidade
-        $dadosCidade['nome'] = $data['localidade'];
-        $data['uf_id'] = $dadosCidade['uf_id'] = $estadoId;
-        $reponse_cidade = findInsertCidade($dadosCidade);
-        $cidadeId = $reponse_cidade['id'];
+
         // Pegar id Bairro ou cadastrar Bairro
         $dadosBairro['nome'] = $data['bairro'];
         $data['cidade_id'] = $dadosBairro['cidade_id'] = $cidadeId;
