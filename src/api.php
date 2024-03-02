@@ -100,19 +100,20 @@ function findCEP($cep) {
             if ($countFound > 0) {
                 // Obter resultados
                 $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                
                 return [
-                    'error' => false, 'message' => "API local encontrou informações CEP no BD.", 
+                    'error' => false, 'message' => "API local encontrou informações CEP no BD. NADA", 
                     'record_found' => $countFound, 'data' => $result
                 ];
             } else {
                 $countFound = 0;
                 return [
                     'error' => true, 'message' => "API local não encontrou informações CEP no BD.", 
-                    'record_found' => $countFound, 'data' => null
+                    'record_found' => $countFound, 'data' => []
                 ];
             }
         } else {
-            return ['error' => true, 'message' => "Conexão falhou.", 'record_found' => $countFound,  'data' => null];
+            return ['error' => true, 'message' => "Conexão falhou.", 'record_found' => $countFound,  'data' => []];
         }
 
     } catch (PDOException $e) {
