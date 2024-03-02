@@ -59,7 +59,7 @@ function searchLocalZipcodeExternalApi($cep) {
         
         curl_close($ch);
     }
-    echo json_encode($response_data);
+    echo json_encode($response_data, JSON_UNESCAPED_UNICODE);
 }
 
 function findCEP($cep) {
@@ -94,12 +94,12 @@ function findCEP($cep) {
             $stmt->bindParam(':cep', $cep, PDO::PARAM_STR);
             $stmt->execute();
     
-            // Obter resultados
-            $result = $stmt->fetch(PDO::FETCH_ASSOC);
-    
             // retorna os resultados
-            $countFound = count($result);
+            $countFound = $stmt->rowCount();
+
             if ($countFound > 0) {
+                // Obter resultados
+                $result = $stmt->fetch(PDO::FETCH_ASSOC);
                 return [
                     'error' => false, 'message' => "API local encontrou informações CEP no BD.", 
                     'record_found' => $countFound, 'data' => $result

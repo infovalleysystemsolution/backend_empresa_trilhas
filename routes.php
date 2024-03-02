@@ -12,7 +12,7 @@ header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
 // Define o tipo de conteúdo como JSON
-header("Content-Type: application/json");
+header("Content-Type: application/json; charset=utf-8");
 
 // Verifica o método da solicitação
 $method = $_SERVER['REQUEST_METHOD'];
