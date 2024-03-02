@@ -94,7 +94,7 @@ function findCEP($cep) {
             $stmt->bindParam(':cep', $cep, PDO::PARAM_STR);
             $stmt->execute();
     
-            // retorna os resultados
+            // contando os registros retornados
             $countFound = $stmt->rowCount();
 
             if ($countFound > 0) {
@@ -137,13 +137,15 @@ function findInsertPais($dados) {
             $stmt->bindParam(':nome', $dados['nome'], PDO::PARAM_STR);
             $stmt->execute();
     
-            // Obter resultados
-            $result = $stmt->fetch(PDO::FETCH_ASSOC);
-    
-            // retorna os resultados
-            if ($countFound = count($result) > 0) {
+            // contando os registros retornados
+            $countFound = $stmt->rowCount();
+
+            if ($countFound > 0) {
+                // Obter resultados
+                $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
                 return [
-                    'error' => false, 'message' => "API local encontrou informações País no BD.", 
+                    'error' => false, 'message' => "API local encontrou informacoes do Pais no BD.", 
                     'record_found' => $countFound, 'id' => $result['id'], 'nome' => $result['nome'], 'sigla' => $result['sigla']
                 ];
             } else {
@@ -189,11 +191,15 @@ function findPais($dados) {
             $stmt->bindParam(':pais', $dados['nome_pais'], PDO::PARAM_STR);
             $stmt->execute();
     
-            // Obter resultados
-            $result = $stmt->fetch(PDO::FETCH_ASSOC);
-    
+            // contando os registros retornados
+            $countFound = $stmt->rowCount();
+
             // retorna os resultados
-            if ($countFound = count($result) > 0) {
+            if ($countFound > 0) {
+
+                // Obter resultados
+                $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
                 return [
                     'error' => false, 'message' => "API local encontrou informações País no BD.", 
                     'record_found' => $countFound, 'id' => $result['id'], 'nome' => $result['nome'], 'sigla' => $result['sigla']
