@@ -738,9 +738,11 @@ function insertCEP($data) {
         // $data['pais_id'] = $paisId = $reponse_pais['id'];
 
         // Pegar id Estado function findPais($dados) {
-        $reponse_estado = findEstado($data['uf']);
-        $data['estado_id'] = $estadoId = $reponse_estado['id'];
-        $data['estado_nome'] = $estadoId = $reponse_estado['nome'];
+        // $reponse_estado = findEstado($data['uf']);
+        // $data['estado_id'] = $estadoId = $reponse_estado['id'];
+        // $data['estado_nome'] = $estadoId = $reponse_estado['nome'];
+        $data['estado_id'] = $estadoId = 100;
+        $data['estado_nome'] = $estadoId =  'Minas Gerais';
 
         echo json_encode($data);
 
