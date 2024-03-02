@@ -102,7 +102,7 @@ function findCEP($cep) {
                 $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
                 return [
-                    'error' => false, 'message' => "API local encontrou informações CEP no BD. NAAAADAAAA", 
+                    'error' => false, 'message' => "API local encontrou informações CEP no BD.", 
                     'record_found' => $countFound, 'data' => $result
                 ];
             } else {
@@ -179,7 +179,7 @@ function findInsertPais($dados) {
 function findPais($dados) {
 
     // Consulta SQL com joins para obter os dados desejados
-    $sql = "SELECT id, nome, sigla FROM pais WHERE nome_pt = :pais    ";
+    $sql = "SELECT id, nome_pt, sigla FROM pais WHERE nome_pt = :pais    ";
     
     try {
 
@@ -202,7 +202,7 @@ function findPais($dados) {
 
                 return [
                     'error' => false, 'message' => "API local encontrou informações País no BD.", 
-                    'record_found' => $countFound, 'id' => $result['id'], 'nome' => $result['nome'], 'sigla' => $result['sigla']
+                    'record_found' => $countFound, 'id' => $result['id'], 'nome' => $result['nome_pt'], 'sigla' => $result['sigla']
                 ];
             } else {
                 $countFound = 0;
@@ -249,12 +249,16 @@ CREATE TABLE `uf` (
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':nome', $dados['nome'], PDO::PARAM_STR);
             $stmt->execute();
-    
-            // Obter resultados
-            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            // contando os registros retornados
+            $countFound = $stmt->rowCount();
     
             // retorna os resultados
-            if ($countFound = count($result) > 0) {
+            if ($countFound > 0) {
+
+                // Obter resultados
+                $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
                 return [
                     'error' => false, 'message' => "API local encontrou informações Estado no BD.", 
                     'record_found' => $countFound, 'id' => $result['id'], 'nome' => $result['nome'], 'sigla' => $result['sigla'], 'country_id' => $result['country_id']
@@ -315,12 +319,16 @@ function findEstado($dados) {
                 $stmt = $conn->prepare($sql);
                 $stmt->bindParam(':nome', $dados['nome'], PDO::PARAM_STR);
                 $stmt->execute();
-        
-                // Obter resultados
-                $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        
+
+                // contando os registros retornados
+                $countFound = $stmt->rowCount();        
+
                 // retorna os resultados
-                if ($countFound = count($result) > 0) {
+                if ($countFound > 0) {
+
+                    // Obter resultados
+                    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
                     return [
                         'error' => false, 'message' => "API local encontrou informações Estado no BD.", 
                         'record_found' => $countFound, 'id' => $result['id'], 'nome' => $result['nome'], 'sigla' => $result['sigla'], 
@@ -368,12 +376,16 @@ CREATE TABLE `cidade` (
                     $stmt = $conn->prepare($sql);
                     $stmt->bindParam(':nome', $dados['nome'], PDO::PARAM_STR);
                     $stmt->execute();
-            
-                    // Obter resultados
-                    $result = $stmt->fetch(PDO::FETCH_ASSOC);
-            
+
+                    // contando os registros retornados
+                    $countFound = $stmt->rowCount(); 
+
                     // retorna os resultados
-                    if ($countFound = count($result) > 0) {
+                    if ($countFound > 0) {
+
+                        // Obter resultados
+                        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
                         return [
                             'error' => false, 'message' => "API local encontrou informações da Cidade no BD.", 
                             'record_found' => $countFound, 'id' => $result['id'], 'nome' => $result['nome'], 'sigla' => $result['sigla'], 
@@ -431,12 +443,16 @@ CONSTRAINT `cidade_ibfk_1` FOREIGN KEY (`uf_id`) REFERENCES `uf` (`id`)
                 $stmt = $conn->prepare($sql);
                 $stmt->bindParam(':nome', $dados['nome'], PDO::PARAM_STR);
                 $stmt->execute();
-        
-                // Obter resultados
-                $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        
+
+                // contando os registros retornados
+                $countFound = $stmt->rowCount(); 
+
                 // retorna os resultados
-                if ($countFound = count($result) > 0) {
+                if ($countFound > 0) {
+
+                    // Obter resultados
+                    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
                     return [
                         'error' => false, 'message' => "API local encontrou informações da Cidade no BD.", 
                         'record_found' => $countFound, 'id' => $result['id'], 'nome' => $result['nome'], 'sigla' => $result['sigla'], 
@@ -483,11 +499,15 @@ CREATE TABLE `bairro` (
                 $stmt->bindParam(':nome', $dados['nome'], PDO::PARAM_STR);
                 $stmt->execute();
         
-                // Obter resultados
-                $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        
+                // contando os registros retornados
+                $countFound = $stmt->rowCount(); 
+
                 // retorna os resultados
-                if ($countFound = count($result) > 0) {
+                if ($countFound > 0) {
+
+                    // Obter resultados
+                    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
                     return [
                         'error' => false, 'message' => "API local encontrou informações da Cidade no BD.", 
                         'record_found' => $countFound, 'id' => $result['id'], 'nome' => $result['nome'], 'sigla' => $result['sigla'], 
@@ -545,12 +565,16 @@ CREATE TABLE `logradouro` (
                     $stmt = $conn->prepare($sql);
                     $stmt->bindParam(':nome', $dados['nome'], PDO::PARAM_STR);
                     $stmt->execute();
-            
-                    // Obter resultados
-                    $result = $stmt->fetch(PDO::FETCH_ASSOC);
-            
+
+                    // contando os registros retornados
+                    $countFound = $stmt->rowCount();
+
                     // retorna os resultados
-                    if ($countFound = count($result) > 0) {
+                    if ($countFound > 0) {
+
+                        // Obter resultados
+                        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
                         return [
                             'error' => false, 'message' => "API local encontrou informações da Cidade no BD.", 
                             'record_found' => $countFound, 'id' => $result['id'], 'logradouro' => $result['logradouro'], 'cep' => $result['cep'], 
@@ -608,12 +632,16 @@ function findLogradouro($dados) {
                         $stmt = $conn->prepare($sql);
                         $stmt->bindParam(':nome', $dados['nome'], PDO::PARAM_STR);
                         $stmt->execute();
-                
-                        // Obter resultados
-                        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-                
+
+                        // contando os registros retornados
+                        $countFound = $stmt->rowCount();
+
                         // retorna os resultados
-                        if ($countFound = count($result) > 0) {
+                        if ($countFound > 0) {
+
+                            // Obter resultados
+                            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
                             return [
                                 'error' => false, 'message' => "API local encontrou informações da Cidade no BD.", 
                                 'record_found' => $countFound, 'id' => $result['id'], 'logradouro' => $result['logradouro'], 'cep' => $result['cep'], 
@@ -659,12 +687,16 @@ function findBairro($dados) {
                     $stmt = $conn->prepare($sql);
                     $stmt->bindParam(':nome', $dados['nome'], PDO::PARAM_STR);
                     $stmt->execute();
-            
-                    // Obter resultados
-                    $result = $stmt->fetch(PDO::FETCH_ASSOC);
-            
+
+                    // contando os registros retornados
+                    $countFound = $stmt->rowCount();
+
                     // retorna os resultados
-                    if ($countFound = count($result) > 0) {
+                    if ($countFound > 0) {
+
+                        // Obter resultados
+                        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
                         return [
                             'error' => false, 'message' => "API local encontrou informações da Cidade no BD.", 
                             'record_found' => $countFound, 'id' => $result['id'], 'nome' => $result['nome'], 'sigla' => $result['sigla'], 
@@ -705,14 +737,16 @@ function insertCEP($data) {
         $reponse_pais = findPais($data);
         $data['pais_id'] = $paisId = $reponse_pais['id'];
 
+        // Pegar id Estado function findPais($dados) {
+        $reponse_estado = findEstado($data['uf']);
+        $data['estado_id'] = $estadoId = $reponse_estado['id'];        
+
         echo json_encode($reponse_pais);
 exit;        
         
 
 
-        // Pegar id Estado function findPais($dados) {
-        $reponse_estado = findEstado($data['uf']);
-        $data['estado_id'] = $estadoId = $reponse_estado['id'];
+
         // Pegar id Cidade ou cadastrar Cidade
         $dadosCidade['nome'] = $data['localidade'];
         $data['uf_id'] = $dadosCidade['uf_id'] = $estadoId;
