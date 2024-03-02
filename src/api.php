@@ -600,7 +600,7 @@ function findInsertLogradouro($dados) {
                 $countFound = 0;
 
                 // Preparar a consulta para inserir na tabela 'pais'
-                $stmt = $conn->prepare("INSERT INTO logradouro (logradouro, cep, uf_id) VALUES (:logradouro, :cep, :cidade_id)");
+                $stmt = $conn->prepare("INSERT INTO logradouro (logradouro, cep, uf_id) VALUES (:logradouro, :cep, :bairro_id)");
                 $stmt->bindParam(':logradouro', $dados['logradouro']);
                 $stmt->bindParam(':cep', $dados['cep']);
                 $stmt->bindParam(':bairro_id', $dados['bairro_id']);
