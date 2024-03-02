@@ -179,7 +179,7 @@ function findInsertPais($dados) {
 function findPais($dados) {
 
     // Consulta SQL com joins para obter os dados desejados
-    $sql = "SELECT id, nome, sigla FROM pais WHERE nome = :pais    ";
+    $sql = "SELECT id, nome, sigla FROM pais WHERE nome_pt = :pais    ";
     
     try {
 
