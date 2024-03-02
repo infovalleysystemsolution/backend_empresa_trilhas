@@ -317,7 +317,7 @@ function findEstado($dados) {
     
             if ($conn != null) {
                 $stmt = $conn->prepare($sql);
-                $stmt->bindParam(':nome', $dados['nome'], PDO::PARAM_STR);
+                $stmt->bindParam(':nome', $dados['uf'], PDO::PARAM_STR);
                 $stmt->execute();
 
                 // contando os registros retornados
@@ -741,7 +741,8 @@ function insertCEP($data) {
         $reponse_estado = findEstado($data['uf']);
         $data['estado_id'] = $estadoId = $reponse_estado['id'];        
 
-        echo json_encode($reponse_pais);
+        echo json_encode($reponse_estado);
+
 exit;        
         
 
