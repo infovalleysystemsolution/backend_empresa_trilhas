@@ -100,9 +100,9 @@ function findCEP($cep) {
             if ($countFound > 0) {
                 // Obter resultados
                 $result = $stmt->fetch(PDO::FETCH_ASSOC);
-                
+
                 return [
-                    'error' => false, 'message' => "API local encontrou informações CEP no BD. NADA", 
+                    'error' => false, 'message' => "API local encontrou informações CEP no BD. NAAAADAAAA", 
                     'record_found' => $countFound, 'data' => $result
                 ];
             } else {
