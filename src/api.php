@@ -308,7 +308,7 @@ function findEstado($dados) {
     ) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4;
     */
         // Consulta SQL com joins para obter os dados desejados
-        $sql = "SELECT id, nome, sigla, country_id FROM uf WHERE sigla = :uf    ";
+        $sql = "SELECT id, nome, sigla, country_id FROM uf WHERE sigla = :sigla1";
         
         try {
     
@@ -317,7 +317,7 @@ function findEstado($dados) {
     
             if ($conn != null) {
                 $stmt = $conn->prepare($sql);
-                $stmt->bindParam(':uf', $dados['uf'], PDO::PARAM_STR);
+                $stmt->bindParam(':sigla1', $dados['uf'], PDO::PARAM_STR);
                 $stmt->execute();
 
                 // contando os registros retornados
@@ -331,8 +331,8 @@ function findEstado($dados) {
 
                     return [
                         'error' => false, 'message' => "API local encontrou informações Estado no BD.", 
-                        'record_found' => $countFound, 'id' => $result['id'], 'nome' => $result['nome'], 'sigla' => $result['sigla'], 
-                        'country_id' => $result['country_id']
+                        'record_found' => $countFound, 'id' => $result['id'], 'nome' => $result['nome'], 
+                        'sigla' => $result['sigla'], 'country_id' => $result['country_id']
                     ];
                 } else {
                     $countFound = 0;
