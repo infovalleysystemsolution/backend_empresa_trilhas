@@ -309,7 +309,8 @@ function findEstado($dados) {
     */
         // Consulta SQL com joins para obter os dados desejados
         $sql = "SELECT id, nome, sigla, country_id FROM uf WHERE sigla = :sigla1";
-        
+echo json_encode($sql);
+exit;        
         try {
     
             $conn = conectBD();
