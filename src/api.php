@@ -309,8 +309,7 @@ function findEstado($dados) {
     */
         // Consulta SQL com joins para obter os dados desejados
         $sql = "SELECT id, nome, sigla, country_id FROM uf WHERE sigla = :sigla1";
-echo json_encode($sql);
-exit;        
+       
         try {
     
             $conn = conectBD();
@@ -322,9 +321,10 @@ exit;
                 $stmt->execute();
 
                 // contando os registros retornados
-                $countFound = $stmt->rowCount();        
+                $countFound = $stmt->rowCount();
+
 echo json_encode($countFound);
-exit;
+exit; 
                 // retorna os resultados
                 if ($countFound > 0) {
 
@@ -740,7 +740,7 @@ function insertCEP($data) {
         $data['pais_id'] = $paisId = $reponse_pais['id'];
 
         // Pegar id Estado function findPais($dados) {
-        $reponse_estado = findEstado($data['uf']);
+        $reponse_estado = findEstado($data);
         // $data['estado_id'] = $estadoId = $reponse_estado['id'];
         // $data['estado_nome'] = $estadoId = $reponse_estado['nome'];
         $data['estado_id'] = $estadoId = 100;
