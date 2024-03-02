@@ -323,13 +323,18 @@ function findEstado($dados) {
                 // contando os registros retornados
                 $countFound = $stmt->rowCount();
 
-echo json_encode($countFound);
-exit; 
                 // retorna os resultados
                 if ($countFound > 0) {
 
                     // Obter resultados
                     $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+echo json_encode([
+    'error' => false, 'message' => "API local encontrou informações Estado no BD.", 
+    'record_found' => $countFound, 'id' => $result['id'], 'nome' => $result['nome'], 
+    'sigla' => $result['sigla'], 'country_id' => $result['country_id']
+]);
+exit; 
 
                     return [
                         'error' => false, 'message' => "API local encontrou informações Estado no BD.", 
