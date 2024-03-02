@@ -292,21 +292,22 @@ CREATE TABLE `uf` (
 }
 
 function findEstado($dados) {
-    /*
-    CREATE TABLE `uf` (
-      `id` bigint(20) NOT NULL AUTO_INCREMENT,
-      `id_uf` bigint(20) DEFAULT NULL,
-      `nome` varchar(255) DEFAULT NULL,
-      `sigla` varchar(5) DEFAULT NULL,
-      `ibge` int(2) DEFAULT NULL,
-      `country_id` bigint(20) DEFAULT NULL,
-      `ddd` varchar(50) DEFAULT NULL,
-      `capital` varchar(255) DEFAULT NULL,
-      PRIMARY KEY (`id`),
-      KEY `country_id` (`country_id`),
-      CONSTRAINT `uf_ibfk_1` FOREIGN KEY (`country_id`) REFERENCES `pais` (`id`)
-    ) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4;
-    */
+        /*
+        Schema:
+        CREATE TABLE `uf` (
+        `id` bigint(20) NOT NULL AUTO_INCREMENT,
+        `id_uf` bigint(20) DEFAULT NULL,
+        `nome` varchar(255) DEFAULT NULL,
+        `sigla` varchar(5) DEFAULT NULL,
+        `ibge` int(2) DEFAULT NULL,
+        `country_id` bigint(20) DEFAULT NULL,
+        `ddd` varchar(50) DEFAULT NULL,
+        `capital` varchar(255) DEFAULT NULL,
+        PRIMARY KEY (`id`),
+        KEY `country_id` (`country_id`),
+        CONSTRAINT `uf_ibfk_1` FOREIGN KEY (`country_id`) REFERENCES `pais` (`id`)
+        ) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4;
+        */
         // Consulta SQL com joins para obter os dados desejados
         $sql = "SELECT id, nome, sigla, country_id FROM uf WHERE sigla = :sigla1";
        
@@ -328,13 +329,6 @@ function findEstado($dados) {
 
                     // Obter resultados
                     $result = $stmt->fetch(PDO::FETCH_ASSOC);
-
-echo json_encode([
-    'error' => false, 'message' => "API local encontrou informações Estado no BD.", 
-    'record_found' => $countFound, 'id' => $result['id'], 'nome' => $result['nome'], 
-    'sigla' => $result['sigla'], 'country_id' => $result['country_id']
-]);
-exit; 
 
                     return [
                         'error' => false, 'message' => "API local encontrou informações Estado no BD.", 
@@ -740,16 +734,15 @@ function insertCEP($data) {
         $ddd = $data['ddd'];
 
         // Pegar id País function findPais($dados) {
-        $data['nome_pais'] = 'Brasil';    
+        $data['pais_nome'] = 'Brasil';    
         $reponse_pais = findPais($data);
         $data['pais_id'] = $paisId = $reponse_pais['id'];
 
         // Pegar id Estado function findPais($dados) {
-        $reponse_estado = findEstado($data);
-        // $data['estado_id'] = $estadoId = $reponse_estado['id'];
-        // $data['estado_nome'] = $estadoId = $reponse_estado['nome'];
-        $data['estado_id'] = $estadoId = 100;
-        $data['estado_nome'] = $estadoId =  'Minas Gerais';
+        $response_estado = findEstado($data);
+        $data['estado_id'] = $response_estado['id'];
+        $data['estado_nome'] = $response_estado['nome'];
+        $data['estado_sigla'] = $response_estado['sigla'];
 
         echo json_encode($data);
 
