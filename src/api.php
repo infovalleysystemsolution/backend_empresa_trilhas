@@ -323,7 +323,7 @@ function findEstado($dados) {
                 // contando os registros retornados
                 $countFound = $stmt->rowCount();        
 echo json_encode($countFound);
-exit
+exit;
                 // retorna os resultados
                 if ($countFound > 0) {
 
