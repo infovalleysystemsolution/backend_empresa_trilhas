@@ -593,26 +593,27 @@ function findInsertLogradouro($dados) {
                 return [
                     'error' => false, 'message' => "API local encontrou informações da Cidade no BD.", 
                     'record_insert' => false,
-                    'record_found' => $countFound, 'id' => $result['id'], 'logradouro' => $result['logradouro'], 'cep' => $result['cep'], 
-                    'bairro_id' => $result['bairro_id']
+                    'record_found' => $countFound, 'id' => $result['id'], 'nome' => $result['logradouro'], 
+                    'cep' => $result['cep']
                 ];
             } else {
                 $countFound = 0;
 
                 // Preparar a consulta para inserir na tabela 'pais'
-                $stmt = $conn->prepare("INSERT INTO logradouro (logradouro, cep, uf_id) VALUES (:logradouro, :cep, :bairro_id)");
+                $stmt = $conn->prepare("INSERT INTO logradouro (logradouro, cep, bairro_id) VALUES (:logradouro, :cep, :bairro_id)");
                 $stmt->bindParam(':logradouro', $dados['logradouro']);
                 $stmt->bindParam(':cep', $dados['cep']);
                 $stmt->bindParam(':bairro_id', $dados['bairro_id']);
                 $stmt->execute();
             
                 // Recuperar o ID inserido na tabela 'pais'
-                $estadoId = $conn->lastInsertId();
+                $logradouroId = $conn->lastInsertId();
 
                 return [
                     'error' => true, 'message' => "API local não encontrou informações Estado no BD.", 
                     'record_insert' => true,
-                    'record_found' => $countFound, 'id' => $estadoId, 'nome' => $dados['nome'], 'cep' => $dados['cep'], 'bairro_id' => $dados['bairro_id']
+                    'record_found' => $countFound, 'id' => $logradouroId, 'nome' => $dados['logradouro'], 
+                    'cep' => $dados['cep']
                 ];
             }
         } else {
