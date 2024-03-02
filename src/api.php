@@ -424,61 +424,62 @@ function findInsertCidade($dados) {
     }
 }
 
-function findCidade($dados) {
+function findCidade($dados) { // NÃO TESTADO 
     /*
-CREATE TABLE `cidade` (
-`id` bigint(20) NOT NULL AUTO_INCREMENT,
-`nome` varchar(255) DEFAULT NULL,
-`ddd` varchar(5) DEFAULT NULL,
-`uf_id` bigint(20) DEFAULT NULL,
-`ibge` int(7) DEFAULT NULL,
-PRIMARY KEY (`id`),
-KEY `uf_id` (`uf_id`),
-CONSTRAINT `cidade_ibfk_1` FOREIGN KEY (`uf_id`) REFERENCES `uf` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5610 DEFAULT CHARSET=utf8mb4;
+    Schema:
+    CREATE TABLE `cidade` (
+    `id` bigint(20) NOT NULL AUTO_INCREMENT,
+    `nome` varchar(255) DEFAULT NULL,
+    `ddd` varchar(5) DEFAULT NULL,
+    `uf_id` bigint(20) DEFAULT NULL,
+    `ibge` int(7) DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    KEY `uf_id` (`uf_id`),
+    CONSTRAINT `cidade_ibfk_1` FOREIGN KEY (`uf_id`) REFERENCES `uf` (`id`)
+    ) ENGINE=InnoDB AUTO_INCREMENT=5610 DEFAULT CHARSET=utf8mb4;
     */
-        // Consulta SQL com joins para obter os dados desejados
-        $sql = "SELECT id, nome, uf_id FROM cidade WHERE nome = :nome    ";
-        
-        try {
+    // Consulta SQL com joins para obter os dados desejados
+    $sql = "SELECT id, nome, uf_id FROM cidade WHERE nome = :nome    ";
     
-            $conn = conectBD();
-            $countFound = 0;
-    
-            if ($conn != null) {
-                $stmt = $conn->prepare($sql);
-                $stmt->bindParam(':nome', $dados['nome'], PDO::PARAM_STR);
-                $stmt->execute();
+    try {
 
-                // contando os registros retornados
-                $countFound = $stmt->rowCount(); 
+        $conn = conectBD();
+        $countFound = 0;
 
-                // retorna os resultados
-                if ($countFound > 0) {
+        if ($conn != null) {
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam(':nome', $dados['nome'], PDO::PARAM_STR);
+            $stmt->execute();
 
-                    // Obter resultados
-                    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            // contando os registros retornados
+            $countFound = $stmt->rowCount(); 
 
-                    return [
-                        'error' => false, 'message' => "API local encontrou informações da Cidade no BD.", 
-                        'record_found' => $countFound, 'id' => $result['id'], 'nome' => $result['nome'], 'sigla' => $result['sigla'], 
-                        'uf_id' => $result['uf_id']
-                    ];
-                } else {
-                    $countFound = 0;
-    
-                    return [
-                        'error' => true, 'message' => "API local não encontrou informações Estado no BD.", 
-                        'record_found' => $countFound
-                    ];
-                }
+            // retorna os resultados
+            if ($countFound > 0) {
+
+                // Obter resultados
+                $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                return [
+                    'error' => false, 'message' => "API local encontrou informações da Cidade no BD.", 
+                    'record_found' => $countFound, 'id' => $result['id'], 'nome' => $result['nome'], 'sigla' => $result['sigla'], 
+                    'uf_id' => $result['uf_id']
+                ];
             } else {
-                return ['error' => true, 'message' => "Conexão falhou.", 'record_found' => $countFound,  'data' => null];
+                $countFound = 0;
+
+                return [
+                    'error' => true, 'message' => "API local não encontrou informações Estado no BD.", 
+                    'record_found' => $countFound
+                ];
             }
-    
-        } catch (PDOException $e) {
-            return "Erro na consulta: " . $e->getMessage();
+        } else {
+            return ['error' => true, 'message' => "Conexão falhou.", 'record_found' => $countFound,  'data' => null];
         }
+
+    } catch (PDOException $e) {
+        return "Erro na consulta: " . $e->getMessage();
+    }
 }
 
 function findInsertBairro($dados) {
