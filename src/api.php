@@ -496,8 +496,8 @@ function findInsertBairro($dados) {
     */
     // Consulta SQL com joins para obter os dados desejados
     $sql = "SELECT b.id, b.nome, b.cidade_id, c.nome As cidade_nome
-            FROM bairro b 
-            INNER JOIN cidade c on b.cidade_id = c.id 
+            FROM bairro As b 
+            INNER JOIN cidade As c on b.cidade_id = c.id 
             WHERE b.nome = :bairro";
     
     try {
@@ -566,7 +566,10 @@ function findInsertLogradouro($dados) {
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     */
     // Consulta SQL com joins para obter os dados desejados
-    $sql = "SELECT id, logradouro, cep, bairro_id FROM logradouro WHERE nome = :nome    ";
+    $sql = "SELECT l.id, l.logradouro, l.cep  
+            FROM logradouro As l
+            INNER JOIN bairro As b on l.bairro_id = b.id 
+            WHERE l.logradouro = :nome";
     
     try {
 
@@ -575,7 +578,7 @@ function findInsertLogradouro($dados) {
 
         if ($conn != null) {
             $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':nome', $dados['nome'], PDO::PARAM_STR);
+            $stmt->bindParam(':nome', $dados['logradouro'], PDO::PARAM_STR);
             $stmt->execute();
 
             // contando os registros retornados
@@ -589,6 +592,7 @@ function findInsertLogradouro($dados) {
 
                 return [
                     'error' => false, 'message' => "API local encontrou informações da Cidade no BD.", 
+                    'record_insert' => false,
                     'record_found' => $countFound, 'id' => $result['id'], 'logradouro' => $result['logradouro'], 'cep' => $result['cep'], 
                     'bairro_id' => $result['bairro_id']
                 ];
@@ -607,6 +611,7 @@ function findInsertLogradouro($dados) {
 
                 return [
                     'error' => true, 'message' => "API local não encontrou informações Estado no BD.", 
+                    'record_insert' => true,
                     'record_found' => $countFound, 'id' => $estadoId, 'nome' => $dados['nome'], 'cep' => $dados['cep'], 'bairro_id' => $dados['bairro_id']
                 ];
             }
@@ -765,7 +770,11 @@ function insertCEP($data) {
         
         // Pegar id Bairro ou cadastrar Bairro
         $reponse_bairro = findInsertBairro($data);   
-        $data['bairro_id'] = $reponse_bairro['id'];        
+        $data['bairro_id'] = $reponse_bairro['id'];
+        
+        // Pegar id Logradouro ou cadastrar Logradouro  
+        $reponse_logradouro = findInsertLogradouro($data);
+        $data['logradouro_id'] = $reponse_logradouro['id'];        
      
 
 echo json_encode($data);
@@ -776,11 +785,7 @@ exit;
 
 
 
-        // Pegar id Logradouro ou cadastrar Logradouro
-        $dadosLogradouro['logradouro'] = $data['logradouro'];    
-        $data['bairro_id'] = $dadosLogradouro['bairro_id'] = $bairroId;
-        $reponse_logradouro = findInsertLogradouro($dadosCidade);
-        $data['logradouro_id'] = $reponse_logradouro['id'];
+
         return ["error" => false, "data" => $data ];
     
     } catch (PDOException $e) {
