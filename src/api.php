@@ -322,7 +322,8 @@ function findEstado($dados) {
 
                 // contando os registros retornados
                 $countFound = $stmt->rowCount();        
-
+echo json_encode($countFound);
+exit
                 // retorna os resultados
                 if ($countFound > 0) {
 
@@ -738,7 +739,7 @@ function insertCEP($data) {
         $data['pais_id'] = $paisId = $reponse_pais['id'];
 
         // Pegar id Estado function findPais($dados) {
-        // $reponse_estado = findEstado($data['uf']);
+        $reponse_estado = findEstado($data['uf']);
         // $data['estado_id'] = $estadoId = $reponse_estado['id'];
         // $data['estado_nome'] = $estadoId = $reponse_estado['nome'];
         $data['estado_id'] = $estadoId = 100;
