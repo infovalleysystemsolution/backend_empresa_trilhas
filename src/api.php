@@ -308,7 +308,7 @@ function findEstado($dados) {
     ) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4;
     */
         // Consulta SQL com joins para obter os dados desejados
-        $sql = "SELECT id, nome, sigla, country_id FROM uf WHERE nome = :nome    ";
+        $sql = "SELECT id, nome, sigla, country_id FROM uf WHERE nome = :uf    ";
         
         try {
     
@@ -317,7 +317,7 @@ function findEstado($dados) {
     
             if ($conn != null) {
                 $stmt = $conn->prepare($sql);
-                $stmt->bindParam(':nome', $dados['uf'], PDO::PARAM_STR);
+                $stmt->bindParam(':uf', $dados['uf'], PDO::PARAM_STR);
                 $stmt->execute();
 
                 // contando os registros retornados
@@ -737,9 +737,12 @@ function insertCEP($data) {
         $reponse_pais = findPais($data);
         $data['pais_id'] = $paisId = $reponse_pais['id'];
 
+        echo json_encode($data);
+
+exit;          
         // Pegar id Estado function findPais($dados) {
         $reponse_estado = findEstado($data['uf']);
-        $data['estado_id'] = $estadoId = $reponse_estado['id'];        
+        $data['estado_id'] = $estadoId = $reponse_estado['id'];
 
         echo json_encode($reponse_estado);
 
