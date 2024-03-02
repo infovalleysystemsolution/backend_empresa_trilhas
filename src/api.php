@@ -46,17 +46,54 @@ function searchLocalZipcodeExternalApi($cep) {
             // Inserir dados da CEP na base de dados  local            
             $responseInsert = insertCEP($data);
 
-            $response_data = [
-                'error' => true, 'message' => "Falhou o processamento da requisição.", 'data' => []
-            ];              
+            /*
+                    // Extrair informações relevantes
+                    $cep = $data['cep'];
+                    $logradouro = $data['logradouro'];
+                    $complemento = $data['complemento'];
+                    $bairro = $data['bairro'];
+                    $localidade = $data['localidade'];
+                    $uf = $data['uf'];
+                    $ibge = $data['ibge'];
+                    $ddd = $data['ddd'];
+
+                    // Pegar id País function findPais($dados) {
+                    $data['pais_nome'] = 'Brasil';    
+                    $response_pais = findPais($data);
+                    $data['pais_id'] = $response_pais['id'];
+                    $data['pais_sigla'] = $response_pais['sigla'];
+                    
+                    // Pegar id Estado function findPais($dados) {
+                    $response_estado = findEstado($data);
+                    $data['estado_id'] = $response_estado['id'];
+                    // $data['estado_nome'] = $response_estado['nome'];
+                    // $data['estado_sigla'] = $response_estado['sigla'];
+
+                    // Pegar id Cidade ou cadastrar Cidade
+                    $response_cidade = findInsertCidade($data);
+                    $data['cidade_id'] = $response_cidade['id'];    
+                    // $data['cidade_nome'] = $response_cidade['nome'];
+                    
+                    // Pegar id Bairro ou cadastrar Bairro
+                    $reponse_bairro = findInsertBairro($data);   
+                    $data['bairro_id'] = $reponse_bairro['id'];
+                    
+                    // Pegar id Logradouro ou cadastrar Logradouro  
+                    $reponse_logradouro = findInsertLogradouro($data);
+                    $data['logradouro_id'] = $reponse_logradouro['id'];
+            */            
+
             // var_dump($data);
             if ($responseInsert['error'] == false) {
                 $response_data = [
-                    'error' => false, 'message' => "Sucesso ao executar a requisição.", 'data' => $responseInsert['data']
+                    'error' => false,  'data' => $responseInsert['data']
+                ];                
+            } else {
+                $response_data = [
+                    'error' => true, 'message' => "Sucesso ao executar a requisição. Não foi possível inserir ou recuperar os dados."
                 ];                
             }
         }
-        
         curl_close($ch);
     }
     echo json_encode($response_data, JSON_UNESCAPED_UNICODE);
@@ -742,15 +779,6 @@ function findBairro($dados) {   // NÃO TESTADO
 function insertCEP($data) { 
     
     try {
-        // Extrair informações relevantes
-        $cep = $data['cep'];
-        $logradouro = $data['logradouro'];
-        $complemento = $data['complemento'];
-        $bairro = $data['bairro'];
-        $localidade = $data['localidade'];
-        $uf = $data['uf'];
-        $ibge = $data['ibge'];
-        $ddd = $data['ddd'];
 
         // Pegar id País function findPais($dados) {
         $data['pais_nome'] = 'Brasil';    
@@ -775,17 +803,7 @@ function insertCEP($data) {
         
         // Pegar id Logradouro ou cadastrar Logradouro  
         $reponse_logradouro = findInsertLogradouro($data);
-        $data['logradouro_id'] = $reponse_logradouro['id'];        
-     
-
-echo json_encode($data);
-exit;
-        
-
-
-
-
-
+        $data['logradouro_id'] = $reponse_logradouro['id'];
 
         return ["error" => false, "data" => $data ];
     
